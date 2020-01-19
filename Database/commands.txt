@@ -1,0 +1,31 @@
+$> sqlite3 dataBase.db
+SQLite version 3.26.0 2018-12-01 12:34:55
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+sqlite> .command
+
+
+### A few commands
+.tables
+	# Lists all tables in the database.
+.schema tableName
+	# Gives schema for specified table.
+.header ON/OFF
+	# Displays or hides the output table header.
+.mode column
+	# Select mode for the output table.
+.quit
+	# Exists from sqlite3 command line tool.
+
+sqlite> .headers ON
+sqlite> .mode column
+sqlite> SELECT *
+   ...> FROM tableName
+   ...> WHERE condition;
+id	user		email
+------	--------------	----------------------
+1	testman		test@test.com
+2	beans		jeansthebeans@test.com
+3	bobMartin	360noscope@gamer.com
+sqlite>
