@@ -20,59 +20,76 @@ c.execute("""CREATE TABLE IF NOT EXISTS `users` (
 conn.commit()
 
 c.execute("""CREATE TABLE IF NOT EXISTS `profile` (
-            `userId`            INT(11) NOT NULL,
+            `userId`            INTEGER NOT NULL,
             `firstName`         TINYTEXT NOT NULL,
             `lastName`          TINYTEXT NOT NULL,
             `gender`            BOOL NOT NULL,
             `age`               INT(2) NOT NULL,
             `preference`        INT(3) NOT NULL,
-            `fame`              INT(5) NOT NULL DEFAULT 0
+            `fame`              INT(5) NOT NULL DEFAULT 0,
+            FOREIGN KEY (userId) REFERENCES `users` (id)
             )""")
 
 conn.commit()
 
 c.execute("""CREATE TABLE IF NOT EXISTS `interests` (
-            `id`                INT(11) PRIMARY KEY NOT NULL,
+            `id`                INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `interest`          TINYTEXT NOT NULL
             )""")
 
 conn.commit()
 
+c.execute("""CREATE TABLE IF NOT EXISTS `userInterests` (
+            `userId`            INTEGER NOT NULL,
+            `interestID`        INTEGER NOT NULL,
+            FOREIGN KEY (userId) REFERENCES `users` (id),
+            FOREIGN KEY (interestID) REFERENCES `interests` (id)
+            )""")
+
+conn.commit()
+
 c.execute("""CREATE TABLE IF NOT EXISTS `images` (
-            `userId`            INT(11) PRIMARY KEY NOT NULL,
-            `imageName`         TINYTEXT NOT NULL
+            `userId`            INTEGER NOT NULL,
+            `imageName`         TINYTEXT NOT NULL,
+            FOREIGN KEY (userId) REFERENCES `users` (id)
             )""")
 
 conn.commit()
 
 c.execute("""CREATE TABLE IF NOT EXISTS `matches` (
-            `userA`             INT(11) NOT NULL,
-            `userB`             INT(11) NOT NULL
+            `userA`             INTEGER NOT NULL,
+            `userB`             INTEGER NOT NULL,
+            FOREIGN KEY (userA) REFERENCES `users` (id),
+            FOREIGN KEY (userB) REFERENCES `users` (id)
             )""")
 
 conn.commit()
 
 c.execute("""CREATE TABLE IF NOT EXISTS `blocked` (
-            `blockerId`         INT(11) NOT NULL,
-            `blockedId`         INT(11) NOT NULL
+            `blockerId`         INTEGER NOT NULL,
+            `blockedId`         INTEGER NOT NULL,
+            FOREIGN KEY (blockerId) REFERENCES `users` (id),
+            FOREIGN KEY (blockedId) REFERENCES `users` (id)
             )""")
 
 conn.commit()
 
 c.execute("""CREATE TABLE IF NOT EXISTS `location` (
-            `id`                INT(11) NOT NULL,
+            `id`                INTEGER NOT NULL,
             `latitude`          INT(11) NOT NULL,
             `longitude`         INT(11) NOT NULL,
-            `area`              TINYTEXT NOT NULL
+            `area`              TINYTEXT NOT NULL,
+            FOREIGN KEY (id) REFERENCES `users` (id)
             )""")
 
 conn.commit()
 
 c.execute("""CREATE TABLE IF NOT EXISTS `messages` (
-            `id`                INT(11) NOT NULL,
+            `id`                INTEGER NOT NULL,
             `senderId`          INT(11) NOT NULL,
             `receivedId`        INT(11) NOT NULL,
-            `recieved`          BOOL NOT NULL DEFAULT 0
+            `recieved`          BOOL NOT NULL DEFAULT 0,
+            FOREIGN KEY (id) REFERENCES `users` (id)
             )""")
 
 conn.commit()
