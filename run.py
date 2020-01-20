@@ -1,6 +1,9 @@
 import sqlite3
+import bcrypt
+from uuid import uuid4
 from flask import Flask, json, Response, request
 from validators import FormValidator as FV
+from Handlers import User
 app = Flask(__name__)
 
 
@@ -14,21 +17,44 @@ def register():
     username = request.form.get("username")
     email = request.form.get("email")
     password = request.form.get("password")
+    response = {"error": []}
     if username is None or FV.FieldOutOfRange(username, 3, 32):
-        return {"error": "Username must be between 3 and 32 characters"}, 409
+        response["error"] += ("Username out of range",)
     if email is None or FV.FieldTooLong(email, 32):
-        return {"error": "Email required"}, 409
+        response["error"] += ("Email required",)
     if FV.EmailInvalid(email):
-        return {"error": "Invalid Email"}, 409
+        response["error"] += ("Invalid email",)
     if password is None:
-        return {"error": "Password is required"}, 409
-    if FV.PasswordValid(password):
-        return {"error": ""}, 200
+        response["error"] += ("Password is required",)
+    if not FV.PasswordValid(password):
+        response["error"] += ("Invalid password",)
+    user = User()
+    if user.user_exists(email):
+        response["error"] += ("email taken",)
+    if response["error"] is not None:
+        return response, 409
     else:
-        return {"error": "Invalid password"}, 409
+        user = User()
+        user.email = email
+        user.username = username
+        salt = bcrypt.gensalt()
+        user.password = bcrypt.hashpw(password, salt)
+        user.verified = 0
+        user.verificationKey = uuid4()
+        #send email here
+        return response, 201
 
 
-@app.route("/login")
+@app.route("/login", methods=["POST"])
 def login():
-    data = {"errors": ""}
-    return data, 200
+    email = request.form.get("email")
+    password = request.form.get("password")
+    user = User()
+    response = {}
+    user.get_user_by_email(email)
+    if user.password_correct(password):
+        #set cookie here
+        user.get_profile()
+        return response, 200
+    else:
+        return {"errors": "login failed"}, 409
