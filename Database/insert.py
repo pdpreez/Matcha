@@ -8,7 +8,7 @@ c = conn.cursor()
 c.execute("""INSERT INTO `users` (`username`, `email`, `password`) VALUES (
 			'testman',
 			'test@test.com',
-			'G00dPass')""")
+			'G00dPass');""")
 
 conn.commit()
 

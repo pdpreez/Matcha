@@ -8,7 +8,7 @@ c = conn.cursor()
 # The docstring (multiline comment) allows us to write on multiple lines.
 # This is done as in the python documentation.
 c.execute("""CREATE TABLE IF NOT EXISTS `users` (
-            `id`                INT(11) PRIMARY KEY NOT NULL,
+            `id`                INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             `username`          TINYTEXT NOT NULL,
             `email`             TINYTEXT NOT NULL,
             `password`          TINYTEXT NOT NULL,
