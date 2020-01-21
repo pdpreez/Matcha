@@ -1,16 +1,25 @@
 import sqlite3
+from Handlers import User
 
-conn = sqlite3.connect("dataBase.db") # Stores data here. Creates .db file if does not exist.
+conn = sqlite3.connect("dataBase.db")
 
-# A cursor helps us to execute SQL commands.
 c = conn.cursor()
 
-# Creates test user. Note that the password is not yet hashed.
-c.execute("""INSERT INTO `users` (`username`, `email`, `password`) VALUES (
-			'testman',
-			'test@test.com',
-			'G00dPass')""")
+# Searches the database to see if the user exists.
+def dupicateCheck(username, email):
+    query = "SELECT * FROM `users` WHERE `username` = ? OR `email` = ?"
+    c.execute(query, (username, email,))
+    res = c.fetchone()
+    conn.commit()
+    if not res:
+        return response, 202 # Accepted
+    else:
+        return response, 409 # Conflict
 
-conn.commit()
+# Inserts a user into the databse.
+def insertUser(username, email, password):
+    query = "INSERT INTO `users` (`username`, `email`, `password`) VALUES (?, ?, ?)"
+    c.execute(query, (username, email, password))
+    conn.commit()
 
 conn.close()

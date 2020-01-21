@@ -1,6 +1,6 @@
 import sqlite3
-import bcrypt
-from uuid import uuid4
+import bcrypt   # Used for hashing the password.
+from uuid import uuid4  # Used for email verification.
 from flask import Flask, json, Response, request
 from validators import FormValidator as FV
 from Handlers import User
@@ -37,8 +37,12 @@ def register():
         user = User()
         user.email = email
         user.username = username
-        salt = bcrypt.gensalt()
-        user.password = bcrypt.hashpw(password, salt)
+        user.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+        """
+        The variable 'password' needs to be encoded in "utf-8" in order for hashing with bcrypt to work in Python 3.
+        With Python 3, strings are, by default, unicode strings.
+        else: TypeError: Unicode-objects must be encoded before hashing.
+        """
         user.verified = 0
         user.verificationKey = uuid4()
         #send email here
@@ -52,7 +56,7 @@ def login():
     user = User()
     response = {}
     user.get_user_by_email(email)
-    if user.password_correct(password):
+    if user.password_correct(password.encode("utf-8")):
         #set cookie here
         user.get_profile()
         return response, 200
