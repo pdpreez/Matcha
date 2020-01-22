@@ -54,11 +54,28 @@ def login():
     email = request.form.get("email")
     password = request.form.get("password")
     user = User()
-    response = {}
+    #response = {}
     user.get_user_by_email(email)
     if user.password_correct(password.encode("utf-8")):
-        #set cookie here
-        user.get_profile()
+        response = app.make_response(({"errors":""}, 200))
+        response.set_cookie("user", email)
+        # #set cookie here
+        #user.get_profile()
         return response, 200
     else:
         return {"errors": "login failed"}, 409
+
+
+@app.route("/cookie", methods=["GET", "DELETE"])
+def authorise():
+    if request.method == "GET":
+        cookie = request.cookies.get("user")
+        if cookie:
+            return "Yes cookie", 200
+        else:
+            return "No cookie", 409
+    elif request.method == "DELETE":
+        response = app.make_response({"errors":""}, 200)
+        response.set_cookie("user", expires=0)
+        return response
+
