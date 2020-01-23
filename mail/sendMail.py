@@ -6,7 +6,7 @@ def verMail(receiver_email, passcode):
     port = 465
     sender_email = "noreply.matcha2019@gmail.com"
     # For testing, use jeansthebeans@mailinator.com
-    password = "This1isMatcha!"
+    password = ""
     message = MIMEMultipart("aleternative")
     message["Subject"] = "Test email."
     message["From"] = sender_email
