@@ -4,6 +4,9 @@ from uuid import uuid4  # Used for email verification.
 from flask import Flask, json, Response, request
 from validators import FormValidator as FV
 from Handlers import User
+import insert
+import vermail
+
 app = Flask(__name__)
 
 
@@ -45,7 +48,10 @@ def register():
         """
         user.verified = 0
         user.verificationKey = uuid4()
+        # Add user to database here.
+        #insertUser(user.username, user.email, user.password)
         #send email here
+        #verMail(user.email, user.verificationKey)
         return response, 201
 
 
@@ -54,14 +60,12 @@ def login():
     email = request.form.get("email")
     password = request.form.get("password")
     user = User()
-    #response = {}
+    response = {}
     user.get_user_by_email(email)
     if user.password_correct(password.encode("utf-8")):
         response = app.make_response(({"errors":""}, 200))
         response.set_cookie("user", email)
         # #set cookie here
-        print("test")
-        #user.get_profile()
         return response, 200
     else:
         return {"errors": "login failed"}, 409

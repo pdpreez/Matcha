@@ -19,6 +19,9 @@ c.execute("""CREATE TABLE IF NOT EXISTS `users` (
 
 conn.commit()
 
+
+############### TODO Add enumeration.
+# TODO Add liked to the `matches` table.
 c.execute("""CREATE TABLE IF NOT EXISTS `profile` (
             `userId`            INTEGER NOT NULL,
             `firstName`         TINYTEXT NOT NULL,
@@ -89,6 +92,7 @@ c.execute("""CREATE TABLE IF NOT EXISTS `messages` (
             `senderId`          INT(11) NOT NULL,
             `receivedId`        INT(11) NOT NULL,
             `recieved`          BOOL NOT NULL DEFAULT 0,
+            `content`           TINYTEXT NOT NULL,
             FOREIGN KEY (id) REFERENCES `users` (id)
             )""")
 

@@ -2,12 +2,11 @@ import sqlite3
 from Handlers import User
 
 conn = sqlite3.connect("dataBase.db")
-
 c = conn.cursor()
 
 # Searches the database to see if the user exists.
 def dupicateCheck(username, email):
-    query = "SELECT * FROM `users` WHERE `username` = ? OR `email` = ?"
+    query = "SELECT * FROM `users` WHERE `username` = ? OR `email` = ? LIMIT 1"
     c.execute(query, (username, email,))
     res = c.fetchone()
     conn.commit()
