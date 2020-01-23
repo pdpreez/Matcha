@@ -2,6 +2,7 @@ import sqlite3
 import bcrypt
 from validators import FormValidator as FV
 
+
 class User:
 
     def __init__(self):
@@ -15,9 +16,12 @@ class User:
         self.firstname = None
         self.lastname = None
         self.gender = None
-        self.dob = None
+        self.age = None
         self.sexuality = None
         self.fame = None
+        self.latitude = None
+        self.longitude = None
+        self.city = None
         self.interests = []
         self.dbconn = sqlite3.connect("./Database/dataBase.db")
         self.dbconn.row_factory = sqlite3.Row
@@ -50,8 +54,12 @@ class User:
         query = "SELECT * FROM `profile` WHERE `userId`=?"
         self.cursor.execute(query, (self.id,))
         result = self.cursor.fetchall()
-        for item in result:
-            print(dict(item))
+        if len(result) > 0:
+            for item in result:
+                print("get_profile")
+                print(item)
+        else:
+            print("boo")
 
     def get_user_by_username(self, username):
         query = "SELECT * FROM `users` WHERE `username`=?"
@@ -65,6 +73,11 @@ class User:
             self.verified = item["verified"]
             self.verificationKey = item["verificationKey"]
             self.reported = item["reported"]
+
+    def save_user(self):
+        query = "INSERT INTO `users`(username, email, password, verificationKey) VALUES(?, ?, ?, ?)"
+        self.cursor.execute(query, (self.username, self.email, self.password, self.verificationKey))
+        self.dbconn.commit()
 
     def password_correct(self, password):
         if bcrypt.checkpw(password, self.password):
@@ -122,4 +135,3 @@ class User:
             return True
         else:
             return False
-

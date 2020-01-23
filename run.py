@@ -1,11 +1,14 @@
 import sqlite3
 import bcrypt   # Used for hashing the password.
+import requests # To call other APIs, specifically for geolocation
 from uuid import uuid4  # Used for email verification.
 from flask import Flask, json, Response, request
 from validators import FormValidator as FV
 from Handlers import User
-import insert
-import vermail
+#import insert
+#import vermail
+
+geoAPI = "http://ip-api.com/json/"
 
 app = Flask(__name__)
 
@@ -34,7 +37,8 @@ def register():
     user = User()
     if user.user_exists(email):
         response["error"] += ("email taken",)
-    if response["error"] is not None:
+    if len(response["error"]) > 0:
+        print(len(response["error"]))
         return response, 409
     else:
         user = User()
@@ -47,9 +51,9 @@ def register():
         else: TypeError: Unicode-objects must be encoded before hashing.
         """
         user.verified = 0
-        user.verificationKey = uuid4()
+        user.verificationKey = str(uuid4().time_low) # Converts uuid to int, then to string, so it's stored correctly in the database
         # Add user to database here.
-        #insertUser(user.username, user.email, user.password)
+        user.save_user()
         #send email here
         #verMail(user.email, user.verificationKey)
         return response, 201
@@ -96,3 +100,28 @@ def verify():
         return 200
     else:
         return 409
+
+
+@app.route("/profile", methods=["GET"])
+def profile():
+    email = request.args.get("email")
+    user = User()
+    user.get_user_by_email(email)
+    user.get_profile()
+    print(user.gender)
+    resp = app.make_response(("response", 200))
+    return resp
+
+
+@app.route("/locate", methods=["GET"])
+def locate():
+    ip_addr = request.remote_addr
+    email = request.args.get("email")
+    user = User()
+    user.get_user_by_email(email)
+    r = requests.get(geoAPI)
+    r = json.loads(r.text)
+    user.latitude = r["lat"]
+    user.longitude = r["lon"]
+    user.city = r["city"]
+    return ip_addr, 200
