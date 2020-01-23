@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def root():
-    return "Welcome to matcha"
+    return "Welcome to Matcha"
 
 
 @app.route("/register", methods=["POST"])
@@ -60,6 +60,7 @@ def login():
         response = app.make_response(({"errors":""}, 200))
         response.set_cookie("user", email)
         # #set cookie here
+        print("test")
         #user.get_profile()
         return response, 200
     else:
@@ -70,12 +71,24 @@ def login():
 def authorise():
     if request.method == "GET":
         cookie = request.cookies.get("user")
-        if cookie:
+        user = request.args.get("email")
+        if cookie == user:
             return "Yes cookie", 200
         else:
             return "No cookie", 409
     elif request.method == "DELETE":
-        response = app.make_response({"errors":""}, 200)
+        response = app.make_response(({"errors":""}, 200))
         response.set_cookie("user", expires=0)
         return response
 
+
+@app.route("/verify", methods=["GET"])
+def verify():
+    email = request.args.get("email")
+    key = request.args.get("key")
+    user = User()
+    user.get_user_by_email(email)
+    if user.verify_user(key):
+        return 200
+    else:
+        return 409
