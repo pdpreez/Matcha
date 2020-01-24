@@ -3,6 +3,7 @@ import bcrypt   # Used for hashing the password.
 import requests # To call other APIs, specifically for geolocation
 from uuid import uuid4  # Used for email verification.
 from flask import Flask, json, Response, request
+from flask_cors import CORS
 from validators import FormValidator as FV
 from Handlers import User
 #import insert
@@ -11,7 +12,7 @@ from Handlers import User
 geoAPI = "http://ip-api.com/json/"
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route("/", methods=["GET", "POST"])
 def root():
@@ -61,13 +62,15 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
-    email = request.form.get("email")
-    password = request.form.get("password")
+    req = json.loads(request.data.decode())
+    email = req["email"]
+    password = req["password"]
     user = User()
     response = {}
     user.get_user_by_email(email)
     if user.password_correct(password.encode("utf-8")):
-        response = app.make_response(({"errors":""}, 200))
+        response = app.make_response(({"errors": ""}, 200))
+        # response.headers.add('Access-Control-Allow-Origin', '*')
         response.set_cookie("user", email)
         # #set cookie here
         return response, 200
