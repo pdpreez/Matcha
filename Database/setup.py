@@ -90,4 +90,5 @@ c.execute("""CREATE TABLE IF NOT EXISTS `messages` (
             )""")
 conn.commit()
 
+
 conn.close()
