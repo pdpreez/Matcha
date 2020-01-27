@@ -2,10 +2,6 @@ import sqlite3
 
 conn = sqlite3.connect("dataBase.db") # Stores data here. Creates .db file if does not exist.
 
-conn.execute("PRAGMA foreign_keys = ON") # Enables CASCADE and FOREIGN KEY use.
-# ^ There is a small problem with the line above.
-# It works when you input it into the sqlite command line programme.
-
 # A cursor helps us to execute SQL commands.
 c = conn.cursor()
 
@@ -26,13 +22,17 @@ c.execute("""CREATE TABLE IF NOT EXISTS `profile` (
             `userId`            INTEGER NOT NULL,
             `firstName`         TINYTEXT NOT NULL,
             `lastName`          TINYTEXT NOT NULL,
-            `gender`            BOOL NOT NULL,
-            `age`               INT(2) NOT NULL,
-            `preference`        INT(3) NOT NULL,
-            `fame`              INT(5) NOT NULL DEFAULT 0,
+            `gender`            INTEGER NOT NULL CHECK (`gender` > -1 AND `gender` < 2),
+            `age`               INTEGER NOT NULL CHECK (`age` > 17 AND `age` < 101),
+            `preference`        INTEGER NOT NULL CHECK (`preference` > -1 AND `preference` < 3),
+            `fame`              INT(3) NOT NULL DEFAULT 0,
             FOREIGN KEY (userId) REFERENCES `users` (id)
                 ON DELETE CASCADE
             )""")
+# profile:
+#             gender - 0 for female and 1 for male.
+#             age - between 18 and 100.
+#             preference - 0 for females, 1 for male and 2 for both.
 conn.commit()
 
 c.execute("""CREATE TABLE IF NOT EXISTS `interests` (
@@ -65,15 +65,6 @@ c.execute("""CREATE TABLE IF NOT EXISTS `matches` (
             `liked`             INTEGER NOT NULL,
             FOREIGN KEY (userA) REFERENCES `users` (id) ON DELETE CASCADE,
             FOREIGN KEY (userB) REFERENCES `users` (id)
-                ON DELETE CASCADE
-            )""")
-conn.commit()
-
-c.execute("""CREATE TABLE IF NOT EXISTS `blocked` (
-            `blockerId`         INTEGER NOT NULL,
-            `blockedId`         INTEGER NOT NULL,
-            FOREIGN KEY (blockerId) REFERENCES `users` (id) ON DELETE CASCADE,
-            FOREIGN KEY (blockedId) REFERENCES `users` (id)
                 ON DELETE CASCADE
             )""")
 conn.commit()
