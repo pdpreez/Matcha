@@ -14,6 +14,7 @@ geoAPI = "http://ip-api.com/json/"
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route("/", methods=["GET", "POST"])
 def root():
     return "Welcome to Matcha"
@@ -21,9 +22,11 @@ def root():
 
 @app.route("/register", methods=["POST"])
 def register():
-    username = request.form.get("username")
-    email = request.form.get("email")
-    password = request.form.get("password")
+    req = json.loads(request.data.decode())
+    print(req)
+    username = req["username"]
+    email = req["email"]
+    password = req["password"]
     response = {"error": []}
     if username is None or FV.FieldOutOfRange(username, 3, 32):
         response["error"] += ("Username out of range",)
@@ -39,7 +42,7 @@ def register():
     if user.user_exists(email):
         response["error"] += ("email taken",)
     if len(response["error"]) > 0:
-        print(len(response["error"]))
+        print(response)
         return response, 409
     else:
         user = User()
