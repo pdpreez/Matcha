@@ -24,8 +24,9 @@ c.execute("""CREATE TABLE IF NOT EXISTS `profile` (
             `lastName`          TINYTEXT NOT NULL,
             `gender`            INTEGER NOT NULL CHECK (`gender` > -1 AND `gender` < 2),
             `age`               INTEGER NOT NULL CHECK (`age` > 17 AND `age` < 101),
-            `preference`        INTEGER NOT NULL CHECK (`preference` > -1 AND `preference` < 3),
+            `preference`        INTEGER NOT NULL DEFAULT 2 CHECK (`preference` > -1 AND `preference` < 3),
             `fame`              INT(3) NOT NULL DEFAULT 0,
+            `bio`               TINYTEXT NOT NULL,
             FOREIGN KEY (userId) REFERENCES `users` (id)
                 ON DELETE CASCADE
             )""")

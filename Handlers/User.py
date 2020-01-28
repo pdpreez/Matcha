@@ -144,18 +144,23 @@ class User:
         else:
             return False
 
-    def update_location(self, lat, lon, city):
+    def update_location(self):
         if len(city) != 0:
             query = "UPDATE `location` SET `lat`=?, `lon`=?, `area`=? WHERE `id`=?"
-            self.cursor.execute(query, (lat, lon, city, self.id))
+            self.cursor.execute(query, (self.latitude, self.longitude, self.city, self.id))
             return True
         else:
             return False
 
-    def add_location(self, lat, lon, city):
+    def add_location(self):
         if len(city) != 0:
             query = "INSERT INTO `location` VALUES (?, ?, ?, ?)"
-            self.cursor.execute(query, (self.id, lat, lon, city))
+            self.cursor.execute(query, (self.id, self.latitude, self.longitude, self.city))
             return True
         else:
             return False
+    
+    def save_profile(self):
+        query = "INSERT INTO `profile` (userId, firstName, lastName, gender, age) VALUES (?, ?, ?, ?, ?)"
+        self.cursor.execute(query, (self.id, self.firstname, self.lastname, self.gender, self.age))
+        self.dbconn.commit()
