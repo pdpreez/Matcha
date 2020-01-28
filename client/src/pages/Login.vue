@@ -6,6 +6,7 @@
         Password: <input v-model="password" type="password" placeholder="password"/><br/>
         <input type="button" value="Login" v-on:click="submit()"/>
     </form>
+    <router-view name="login"/>
 </div>
 </template>
 
@@ -13,7 +14,7 @@
 import axios from 'axios'
 
 export default {
-    name: "Login",
+    name: "login",
     data() {
         return {
             email: "test@email.com",

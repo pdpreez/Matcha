@@ -24,20 +24,20 @@ export default {
     },
     methods:
     {
-        submit: function() {
+        submit: function()
+        {
             const form = {
                 "username": this.username,
                 "email": this.email,
                 "password": this.password
             };
             axios.post("http://localhost:5000/register", form)
-                    .then(function(response){
-                        if (response.status == 201)
-                        {
+                    .then(function(response) {
+                        if (response.status == 201) {
                             console.log("user created");
                         }
                     })
-                    .catch(function(error){
+                    .catch(function(error) {
                         console.log(error);
                         console.log("bad");
                     })
