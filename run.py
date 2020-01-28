@@ -2,8 +2,8 @@ import sqlite3
 import bcrypt   # Used for hashing the password.
 import requests # To call other APIs, specifically for geolocation
 from uuid import uuid4  # Used for email verification.
-from flask import Flask, json, Response, request
-from flask_cors import CORS
+from flask import Flask, json, Response, request, session
+from flask_cors import CORS, cross_origin
 from validators import FormValidator as FV
 from Handlers import User
 #import insert
@@ -12,7 +12,8 @@ from Handlers import User
 geoAPI = "http://ip-api.com/json/"
 
 app = Flask(__name__)
-CORS(app)
+cors = CORS(app, supports_credentials=True)
+app.secret_key = "SECRET"
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -64,6 +65,7 @@ def register():
 
 
 @app.route("/login", methods=["POST"])
+@cross_origin(supports_credentials=True)
 def login():
     req = json.loads(request.data.decode())
     email = req["email"]
@@ -73,8 +75,8 @@ def login():
     user.get_user_by_email(email)
     if user.password_correct(password.encode("utf-8")):
         response = app.make_response(({"errors": ""}, 200))
-        # response.headers.add('Access-Control-Allow-Origin', '*')
-        response.set_cookie("user", email)
+        response.set_cookie("user", email, secure=True)
+        session["user"] = email
         # #set cookie here
         return response, 200
     else:
@@ -91,7 +93,7 @@ def authorise():
         else:
             return "No cookie", 409
     elif request.method == "DELETE":
-        response = app.make_response(({"errors":""}, 200))
+        response = app.make_response(({"errors": ""}, 200))
         response.set_cookie("user", expires=0)
         return response
 

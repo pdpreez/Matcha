@@ -28,11 +28,12 @@ export default {
                 "email": this.email,
                 "password": this.password
             };
-            axios.post("http://localhost:5000/login", form)
+            const self = this;
+            axios.post("http://localhost:5000/login", form, {withCredentials: true})
                     .then(function(response){
                         if (response.status == 200)
                         {
-                            console.log("All good");
+                            self.$router.push({path: "/"})
                         }
                     })
                     .catch(function(error){
