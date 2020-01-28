@@ -135,3 +135,27 @@ class User:
             return True
         else:
             return False
+    
+    def update_preference(self, new_preference):
+        if new_preference > -1 and new_preference < 3:
+            query = "UPDATE `profile` SET `preference`=? WHERE `userId`=?"
+            self.cursor.execute(query, (new_preference, self.id))
+            return True
+        else:
+            return False
+
+    def update_location(self, lat, lon, city):
+        if len(city) != 0:
+            query = "UPDATE `location` SET `lat`=?, `lon`=?, `area`=? WHERE `id`=?"
+            self.cursor.execute(query, (lat, lon, city, self.id))
+            return True
+        else:
+            return False
+
+    def add_location(self, lat, lon, city):
+        if len(city) != 0:
+            query = "INSERT INTO `location` VALUES (?, ?, ?, ?)"
+            self.cursor.execute(query, (self.id, lat, lon, city))
+            return True
+        else:
+            return False
