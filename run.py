@@ -133,3 +133,6 @@ def locate():
     user.longitude = r["lon"]
     user.city = r["city"]
     return ip_addr, 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
