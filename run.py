@@ -2,12 +2,17 @@ import sqlite3
 import bcrypt   # Used for hashing the password.
 import requests # To call other APIs, specifically for geolocation
 from uuid import uuid4  # Used for email verification.
-from flask import Flask, json, Response, request, session
+from flask import Flask, json,jsonify, Response, request, session
 from flask_cors import CORS, cross_origin
 from validators import FormValidator as FV
 from Handlers import User
 #import insert
 #import vermail
+
+# import base64
+
+# image = request.files['image']  
+# image_string = base64.b64encode(image.read())
 
 geoAPI = "http://ip-api.com/json/"
 
@@ -20,14 +25,125 @@ app.secret_key = "SECRET"
 def root():
     return "Welcome to Matcha"
 
+####################### Belongs in profile #######################
+@app.route("/test", methods=["POST"])# Add tag.
+def test():
+    req = json.loads(request.data.decode())
+    email = req["email"]
+    tagId = req["tagId"] # Check if tag is valid.
+    user = User()
+    response = {"error": []}
+    user.get_user_by_email(email)
+    if user.add_tag(tagId):
+        user.get_user_by_email(email) # Updates the user stuff.
+        return response, 201
+    else:
+        response["error"] += ("Tag already selected.",)
+        return response, 409
+
+@app.route("/test2", methods=["POST"]) # Remove tag.
+def test2():
+    req = json.loads(request.data.decode())
+    email = req["email"]
+    tagId = req["tagId"] # Check if tag is valid.
+    user = User()
+    response = {"error": []}
+    user.get_user_by_email(email)
+    if user.remove_tag(tagId):
+        user.get_user_by_email(email) # Updates the user stuff.
+        return response, 201
+    else:
+        response["error"] += ("No tag to remove.",)
+        return response, 409
+
+@app.route("/test3", methods=["POST"]) # Change preference.
+def test3():
+    req = json.loads(request.data.decode())
+    email = req["email"]
+    pref = req["pref"]
+    user = User()
+    response = {"error": []}
+    user.get_user_by_email(email)
+    if user.update_preference(pref):
+        user.get_user_by_email(email) # Updates the user stuff.
+        return response, 201
+    else:
+        response["error"] += ("Invalid preference.",)
+        return response, 409
+
+@app.route("/test4", methods=["POST"]) # Change bio.
+def test4():
+    req = json.loads(request.data.decode())
+    email = req["email"]
+    bio = req["bio"]
+    response = {"error": []}
+    if FV.ValidText(bio):
+        response["error"] += ("Invalid bio.",)
+    user = User()
+    user.get_user_by_email(email)
+    if user.update_bio(bio):
+        user.get_user_by_email(email) # Updates the user stuff.
+        return response, 201
+    else:
+        response["error"] += ("Bio has to be less than 50 characters.",)
+        return response, 409
+
+@app.route("/test5", methods=["POST"]) # Change email.
+def test5():
+    req = json.loads(request.data.decode())
+    email = req["email"]
+    new_email = req["new_email"]
+    response = {"error": []}
+    if email is None or FV.FieldTooLong(email, 32):
+        response["error"] += ("Email required",)
+    if FV.EmailInvalid(email):
+        response["error"] += ("Invalid email",)
+    if len(response["error"]) > 0:
+        print(response)
+        return response, 409
+    else:
+        user = User()
+        user.get_user_by_email(email)
+        if user.update_email(new_email, user.username):
+            user.get_user_by_email(email) # Updates the user stuff.
+            return response, 201
+        else:
+            response["error"] += ("Invalid email address.",)
+            return response, 409
+
+@app.route("/test6", methods=["POST"]) # Change password.
+def test6():
+    req = json.loads(request.data.decode())
+    email = req["email"]
+    password = req["password"]
+    response = {"error": []}
+    if not FV.PasswordValid(password) and password is None:
+        response["error"] += ("Invalid password.",)
+    user = User()
+    user.get_user_by_email(email)
+    if user.update_password(password):
+        user.get_user_by_email(email)
+        return response, 201
+    else:
+        response["error"] += ("Invalid password.",)
+        return response, 409
+
+@app.route("/test7", methods=["POST"]) # Upload image (JSON base64 encoded).
+def test7():
+        return 201
+####################### Belongs in profile #######################
 
 @app.route("/register", methods=["POST"])
 def register():
     req = json.loads(request.data.decode())
-    print(req)
+    print(req) # Remove this
     username = req["username"]
     email = req["email"]
     password = req["password"]
+    firstname = req["firstname"]
+    lastname = req["lastname"]
+    gender = req["gender"]
+    age = req["age"]
     response = {"error": []}
     if username is None or FV.FieldOutOfRange(username, 3, 32):
         response["error"] += ("Username out of range",)
@@ -39,9 +155,17 @@ def register():
         response["error"] += ("Password is required",)
     if not FV.PasswordValid(password):
         response["error"] += ("Invalid password",)
+    if firstname is None or FV.FieldOutOfRange(firstname, 2, 32):
+        response["error"] += ("Invalid firstname",)
+    if lastname is None or FV.FieldOutOfRange(lastname, 2, 32):
+        response["error"] += ("Invalid lastname",)
+    if gender is None or FV.GenderInvalid(gender):
+        response["error"] += ("Invalid gender",)
+    if age is None or FV.AgeInvalid(age):
+        response["error"] += ("Invalid age",)
     user = User()
-    if user.user_exists(email):
-        response["error"] += ("email taken",)
+    if user.user_exists(email, username):
+        response["error"] += ("username or email taken",) # Mitigate enumeration.
     if len(response["error"]) > 0:
         print(response)
         return response, 409
@@ -50,6 +174,10 @@ def register():
         user.email = email
         user.username = username
         user.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+        user.firstname = firstname
+        user.lastname = lastname
+        user.gender = gender
+        user.age = age
         """
         The variable 'password' needs to be encoded in "utf-8" in order for hashing with bcrypt to work in Python 3.
         With Python 3, strings are, by default, unicode strings.
