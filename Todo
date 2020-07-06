@@ -1,0 +1,108 @@
+Account creation:
+ - username
+	* non existing
+	* no spaces
+	* alphanumeric
+	* character limit
+ - first and  last name
+	* no spaces
+	* alphanumeric ???
+	* character limit
+ - secure password
+	* 8 - 32 character limitation
+	* passphrase
+	* encrypted
+ - email address
+	* valid
+	* character limit
+	* non existing
+# The account is created once the email has been verified.
+
+Log in:
+ - login
+	* username or email login
+	* match with password
+ - forgot password
+	* send email for password reset
+ - token
+	* session or JWT ???
+
+Log out:
+ - be able to logout from any page
+	* return user to login page
+	* delete session or JWT
+
+# The user gets to view potential matches but not interact with them till the
+# point that their extended profile has been completed.
+Profile page:
+ - add details
+	* gender
+	* orientation (automatically bi)
+	* short bio
+		^ 50 character limit
+	* interests
+		^ tag form from provided tags
+		^ minimum 1
+	* images
+		^ 5 image limit
+		^ 1 profile picture (minimum amount needed for the profile)
+	* preferences
+		^ age
+ - change details
+	* password
+		^ same as registration (profile creation)
+	* email address
+		^ same as registration (profile creation)
+	* no username change (used for matching)
+	* orientation
+# Once the extended profile has been completed, the user will be able to match.
+
+# Once logged in (once profile is completed):
+Potential matches:
+ - suggested matches
+	>> below is the filtering
+	* tags
+		^ minimum 1
+	* age range
+	* orientation
+	* geolocation
+	* popularity
+		^ the higher the better
+ - searching
+	* age range
+	* popularity
+	* tags
+		^ account for multiple
+	* geolocation
+
+-- Other (needed items) --
+
+User:
+ - username
+ - firstname
+ - lastname
+ - email
+ - password
+ - age
+	^ no under 18s allowed
+ -------
+ - bio
+ - interests
+ - geolocation
+	^ lat
+	^ long
+ - pictures
+ - populatiry
+	^ start with 0/5
+ - views to profile
+	^ maximum 3 views
+ - matches
+	^ by username
+
+There user will be given a JWT (on login).
+This token will be used to know who viewed your profile.
+It will contain a hashed version of the user's username (security).
+
+Check the email.
+
+Store images.
